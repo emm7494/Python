@@ -1,4 +1,4 @@
 # Python
 
 My Python playground...
-play here
+play here if you can
