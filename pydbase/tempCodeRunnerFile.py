@@ -1,2 +1,2 @@
-            for i in types:
-                print(i, type(i))
+    except Error as e:
+        print(e)

@@ -1,10 +1,44 @@
+import os
+from contextlib import contextmanager
 import sqlite3
 from sqlite3 import Error
 
 
-def main():
-    db_file = 'pydbase/pysqlite3.db'
+@contextmanager
+def manage_db_conn(db_filename):
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    db_file = os.path.join(basedir, f'{db_filename}.db')
+    try:
+        con = sqlite3.connect(db_file)
+        con.row_factory = sqlite3.Row
+        yield con
+    except Error as err:
+        print(f'SQLite, {type(err).__name__}: {err}.')
+    except Exception as err:
+        print(f'Python, {type(err).__name__}: {err}.')
+    else:
+        print('\nAll operations were successful!!!')
+        print(
+            f'Your database file: "{db_filename}.db" is loacated at: "{db_file}".')
+    finally:
+        con.close()
+        print('Connection closed successfully!!!\n')
 
+
+def run_sql(*query, db_filename='app'):
+    with manage_db_conn(db_filename) as con:
+        with con:
+            cur = con.cursor()
+            try:
+                cur.execute(*query)
+            except ValueError as err:
+                raise err
+            else:
+                print(f'No Error excutin SQL.')
+
+
+if __name__ == '__main__':
+    # main()
     sql_create_projects_table = """ CREATE TABLE IF NOT EXISTS projects (
                                             id integer PRIMARY KEY,
                                             name text NOT NULL,
@@ -22,24 +56,4 @@ def main():
                                         end_date text NOT NULL,
                                         FOREIGN KEY (project_id) REFERENCES projects (id)
                                     );"""
-    conn = create_connection(db_file)
-    if db_file is not None:
-        print('Success! Created database connection.')
-    else:
-        print('Error! Could not create database connection.')
-
-
-def create_connection(db_file):
-    '''create a database connection to SQLite database'''
-    try:
-        conn = sqlite3.connect(db_file)
-        print(sqlite3.version)
-    except Error as e:
-        print(e)
-    finally:
-        conn.close()
-    return None
-
-
-if __name__ == '__main__':
-    main()
+    run_sql(sql_create_tasks_table)

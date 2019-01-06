@@ -1,3 +1,4 @@
+from itertools import chain
 from functools import update_wrapper, wraps
 
 
@@ -28,6 +29,20 @@ class CountCalls(object):
         )
 
 
+def parcheck(*types):
+    def decorator(fn):
+        @wraps(fn)
+        def inner(*args, **kwargs):
+            for _type, _arg in zip(types, args):
+                print(f'Parameter "{_arg}" is of type "{_type}".')
+                assert isinstance(
+                    _arg, _type
+                ), f'Parameter type check failed for input value:"{_arg}" as "{_type.__name__}"; input value:"{_arg}" is of type "{type(_arg).__name__}"!'
+            return fn(*args, **kwargs)
+        return inner
+    return decorator
+
+
 @parcheck(int)
 @CountCalls
 def foo(num):
@@ -44,28 +59,21 @@ def baz():
     pass
 
 
-def parcheck(*types):
-    def decorator(fn):
-        @wraps(fn)
-        def inner(*args, **kwargs):
-            for _type, _arg in zip(types, args):
-                print(f'Parameter "{_arg}" is of type "{_type}".')
-                assert isinstance(
-                    _arg, _type
-                ), f'Parameter type check failed for input value:"{_arg}" as "{_type.__name__}"; input value:"{_arg}" is of type "{type(_arg).__name__}"!'
-            return fn(*args, **kwargs)
-        return inner
-    return decorator
-
-
 @parcheck(int, int, int)
 def sum(x, y, z):
     return f'The sum of x, y and z is "{x + y + z}".'
 
 
+def yield_factors_of(num_0):
+    from math import sqrt
+    return ((num_1, num_0//num_1) for num_1 in range(1, int(sqrt(num_0))+1) if num_0 % num_1 == 0)
+
+
 def main():
-    print(sum(1, 2, 3))
-    foo('cat')
+    it = chain(*yield_factors_of(100))
+    print(sorted(set(it), key=abs, reverse=True))
+    # print(sum(1, 2, 3))
+    # foo('cat')
     # for i in range(1):
     #     foo('foo 99'), bar('bar, hi')
     # for i in range(1):
