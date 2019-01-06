@@ -15,14 +15,14 @@ def manage_db_conn(db_filename):
     except Error as err:
         print(f'SQLite, {type(err).__name__}: {err}.')
     except Exception as err:
-        print(f'Python, {type(err).__name__}: {err}.')
+        print(f'\nPython, {type(err).__name__}: {err}.')
     else:
         print('\nAll operations were successful!!!')
         print(
-            f'Your database file: "{db_filename}.db" is loacated at: "{db_file}".')
+            f'\nYour database file: "{db_filename}.db" is loacated at: "{db_file}".')
     finally:
         con.close()
-        print('Connection closed successfully!!!\n')
+        print('\nConnection closed successfully!!!')
 
 
 def run_sql(*query, db_filename='app'):
@@ -34,7 +34,7 @@ def run_sql(*query, db_filename='app'):
             except ValueError as err:
                 raise err
             else:
-                print(f'No Error excutin SQL.')
+                print(f'\nNo error while executing SQL.')
 
 
 if __name__ == '__main__':
@@ -56,4 +56,4 @@ if __name__ == '__main__':
                                         end_date text NOT NULL,
                                         FOREIGN KEY (project_id) REFERENCES projects (id)
                                     );"""
-    run_sql(sql_create_tasks_table)
+    run_sql(sql_create_projects_table)
